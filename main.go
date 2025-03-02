@@ -1,35 +1,38 @@
 package main
 
 import (
-	"currency/customscheduler"
+	scheduler "currency/custom_scheduler"
+	"currency/custom_scheduler/jobs"
 	"currency/db"
 	"currency/env"
-	"currency/models"
+	"currency/services"
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	env.Init()
-	scheduler := customscheduler.Init()
-	server := gin.Default()
-	database := db.Init()
+var currencyService = services.NewCurrencyService()
 
-	scheduler.Start()
+func main() {
+	env.Load()
+	_ = db.DB()
+
+	customScheduler := scheduler.NewCustomScheduler()
+	customScheduler.LoadJob(jobs.NewCurrencyJob())
+	customScheduler.Start()
+
+	server := gin.Default()
 
 	server.GET("/data", func(c *gin.Context) {
-		var currencies []models.Currency
-		var day = c.Query("day")
+		day := c.Query("day")
 
 		if len(day) == 0 {
-			database.Find(&currencies)
-			c.JSON(200, currencies)
+			c.JSON(200, currencyService.FindAll())
 			return
 		}
 
-		c.JSON(200, day)
+		c.JSON(200, currencyService.FindAllByDay(day))
 	})
 
-	err := server.Run(env.GetEnv("SERVER_PORT", ":8080"))
+	err := server.Run(env.GetEnv("SERVER_ADDRESS", ":8080"))
 
 	if err != nil {
 		panic("Error starting server: " + err.Error())

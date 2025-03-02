@@ -6,11 +6,11 @@ import (
 	"os"
 )
 
-func Init() {
+func Load() {
 	err := godotenv.Load()
 
 	if err != nil {
-		log.Fatalln("Error loading .env file")
+		log.Println("Can not load .env file: " + err.Error())
 	}
 }
 
