@@ -5,6 +5,7 @@ import (
 	"currency/services"
 	"encoding/json"
 	"github.com/go-co-op/gocron/v2"
+	"io"
 	"log"
 	"net/http"
 )
@@ -28,13 +29,16 @@ func NewCurrencyJob() (gocron.JobDefinition, gocron.Task) {
 
 			defer response.Body.Close()
 
-			bytes := make([]byte, response.ContentLength)
-			_, err = response.Body.Read(bytes)
-
-			var data []*models.Currency
-			err = json.Unmarshal(bytes, &data)
+			body, err := io.ReadAll(response.Body)
 
 			if err != nil {
+				log.Printf("Can not read response body: " + err.Error())
+				return
+			}
+
+			var data []*models.Currency
+
+			if err = json.Unmarshal(body, &data); err != nil {
 				log.Printf("Can not parse json: " + err.Error())
 				return
 			}
