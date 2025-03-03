@@ -9,21 +9,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var currencyService = services.NewCurrencyService()
+var (
+	currencyService = services.NewCurrencyService()
+	customScheduler = scheduler.NewCustomScheduler()
+	server          = gin.Default()
+)
 
-func main() {
+func InitService() {
 	env.Load()
 	db.Init()
-	db.Migrate()
-
-	customScheduler := scheduler.NewCustomScheduler()
 	customScheduler.LoadJob(jobs.NewCurrencyJob())
 	customScheduler.Start()
+}
 
-	server := gin.Default()
+func main() {
+	InitService()
 
 	server.GET("/data", func(c *gin.Context) {
-		day := c.Query("day")
+		day := c.Query("date")
 
 		if len(day) == 0 {
 			c.JSON(200, currencyService.FindAll())

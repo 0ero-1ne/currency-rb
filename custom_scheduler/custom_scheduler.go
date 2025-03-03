@@ -26,11 +26,13 @@ func (scheduler *CustomScheduler) LoadJob(
 	jobTask gocron.Task,
 	options ...gocron.JobOption,
 ) {
-	_, err := scheduler.scheduler.NewJob(jobTime, jobTask, options...)
+	job, err := scheduler.scheduler.NewJob(jobTime, jobTask, options...)
 
 	if err != nil {
 		log.Fatalln("Can not schedule job: " + err.Error())
 	}
+
+	log.Printf("Job %s (ID: %v) loaded", job.Name(), job.ID())
 }
 
 func (scheduler *CustomScheduler) Start() {

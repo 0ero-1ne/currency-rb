@@ -26,12 +26,12 @@ func Init() {
 	if err != nil {
 		log.Fatalln("Failed to connect to database: " + err.Error())
 	}
-}
 
-func Migrate() {
-	err := database.AutoMigrate(&models.Currency{})
+	err = database.AutoMigrate(&models.Currency{})
 
 	if err != nil {
 		log.Fatalln("Failed to migrate database: " + err.Error())
 	}
+
+	log.Println("Successfully connected to database")
 }
