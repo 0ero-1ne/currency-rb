@@ -14,15 +14,10 @@ var (
 )
 
 func DB() *gorm.DB {
-	if database == nil {
-		initDB()
-		migrateDB()
-	}
-
 	return database
 }
 
-func initDB() {
+func Init() {
 	dsn := env.GetEnv("DATABASE_URL", defaultDSN)
 
 	var err error
@@ -33,7 +28,7 @@ func initDB() {
 	}
 }
 
-func migrateDB() {
+func Migrate() {
 	err := database.AutoMigrate(&models.Currency{})
 
 	if err != nil {

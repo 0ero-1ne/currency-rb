@@ -13,7 +13,8 @@ var currencyService = services.NewCurrencyService()
 
 func main() {
 	env.Load()
-	_ = db.DB()
+	db.Init()
+	db.Migrate()
 
 	customScheduler := scheduler.NewCustomScheduler()
 	customScheduler.LoadJob(jobs.NewCurrencyJob())
